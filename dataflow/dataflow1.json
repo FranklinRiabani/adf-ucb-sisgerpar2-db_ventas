@@ -1,0 +1,98 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "clientes_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "cluestes_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id_cliente as integer,",
+				"          {ci-nit} as integer,",
+				"          nombre as string,",
+				"          {fecha-nac} as string,",
+				"          genero as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive({fecha-nac} = coalesce(\r",
+				"    toDate({fecha-nac}, 'yyyy-MM-dd'),\r",
+				"    toDate({fecha-nac}, 'dd/MM/yyyy'),\r",
+				"    toDate({fecha-nac}, 'dd-MM-yyyy'),\r",
+				"    toDate(\r",
+				"        regexReplace(\r",
+				"            regexReplace(\r",
+				"                regexReplace(\r",
+				"                    regexReplace(\r",
+				"                        regexReplace(\r",
+				"                            regexReplace(\r",
+				"                                regexReplace(\r",
+				"                                    regexReplace(\r",
+				"                                        regexReplace(\r",
+				"                                            regexReplace(\r",
+				"                                                regexReplace(\r",
+				"                                                    regexReplace(lower({fecha-nac}), 'ene', '01'),\r",
+				"                                                'feb', '02'),\r",
+				"                                            'mar', '03'),\r",
+				"                                        'abr', '04'),\r",
+				"                                    'may', '05'),\r",
+				"                                'jun', '06'),\r",
+				"                            'jul', '07'),\r",
+				"                        'ago', '08'),\r",
+				"                    'sep', '09'),\r",
+				"                'oct', '10'),\r",
+				"            'nov', '11'),\r",
+				"        'dic', '12'),\r",
+				"        'd/MM/yyyy'\r",
+				"    )\r",
+				")) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          ID_CLIENTE as integer,",
+				"          CI_NIT as integer,",
+				"          NOMBRE as string,",
+				"          FECHA_NAC as date,",
+				"          GENERO as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          ID_CLIENTE = id_cliente,",
+				"          CI_NIT = {ci-nit},",
+				"          NOMBRE = nombre,",
+				"          FECHA_NAC = {fecha-nac},",
+				"          GENERO = genero",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"name": "adf-ucb-sisgerpar270364396",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "33db6713-4f23-4470-bad9-f8b752eabaf8",
+		"tenantId": "cc28633f-12b8-46cb-bc15-951dae239b4d"
+	}
+}
